@@ -15,7 +15,7 @@ AEM Links Index
 ---------
 
 
-###Start Here
+### Start Here
 * [Adobe Experience Manager Onboarding resources](https://helpx.adobe.com/experience-manager/using/onboardAEM.html)
 * [Experiencing Adobe Experience Manger - Day CQ](http://experience-aem.blogspot.com/2013/08/in-blog-experiencing-adobe-experience.html)
 * [My HUGE list of AEM bookmarks](http://aemtips.blogspot.com/2013/05/my-huge-list-of-aem-bookmarks.html)
