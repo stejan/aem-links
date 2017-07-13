@@ -235,6 +235,7 @@ In our case, it was related to MSM rollouts that got messed up somehow so they b
 ---
   
 ### Fix Inconsistencies in the repository when SegmentNotFound Issue is reported in AEM 6.x
+see also: https://helpx.adobe.com/experience-manager/kb/fix-inconsistencies-in-the-repository-when-segmentnotfound-issue.html
 Observed SegmentNotFound Exceptions in the logs. For example:
 
 Problem:
