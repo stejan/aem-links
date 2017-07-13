@@ -231,3 +231,38 @@ Seen in AEM 6.2 SP1. For me, it was a `cq:policy` property that was pointing to 
 As seen via `top` command, the io wait `wa` is constantly above 30%.
 
 In our case, it was related to MSM rollouts that got messed up somehow so they bogged down the system. We noticed this by looking at the events via `/system/console/events`
+  
+---
+  
+### Fix Inconsistencies in the repository when SegmentNotFound Issue is reported in AEM 6.x
+Observed SegmentNotFound Exceptions in the logs. For example:
+
+Problem:
+[1] \*ERROR* [FelixStartLevel] org.apache.sling.event [org.apache.sling.event.impl.jobs.queues.QueueManager(1431)] The activate method has thrown an exception (org.apache.jackrabbit.oak.plugins.segment.SegmentNotFoundException: Segment da5bcb95-d00a-4c04-a9d9-0f10f2b14e5e not found)
+
+[2] \*ERROR* [pool-6-thread-3] org.apache.sling.commons.scheduler.impl.QuartzScheduler Exception during job execution of org.apache.jackrabbit.oak.plugins.index.AsyncIndexUpdate@1dc173f9 : Segment e669f30b-e886-4b7a-b161-56432601ec6b not found
+org.apache.jackrabbit.oak.plugins.segment.SegmentNotFoundException: Segment e669f30b-e886-4b7a-b161-56432601ec6b not found
+
+Cause:
+Due to some older issues in Oak or some inconsistencies in the repository, a segment can go missing and repository might be inconsistent.
+
+1. Download version of oak-run that matches to your oak core version from 
+https://mvnrepository.com/artifact/org.apache.jackrabbit/oak-run
+
+2. To revert a corrupt segment store to its latest good state change into CQ's working directory (the one containing the crx-quickstartfolder) and backup all files in ./crx-quickstart/repository/segmentstore/.
+
+3. Run the consistency check,  
+`java -Xmx6000m -jar oak-run-*.jar check -d1 -p /path/to/crx-quickstart/repository/segmentstore`       
+This searches backwards through the revisions until it finds a consistent one:  
+Look for message like below:  
+[main] INFO o.a.j.o.p.s.f.t.ConsistencyChecker - Found latest good revision afdb922d-ba53-4a1b-aa1b-1cb044b535cf:234880
+
+4. Revert the repository to this revision by editing ./crx-quickstart/repository/segmentstore/journal.log and deleting all lines after the line containing the latest good revision.
+
+5. Remove all ./crx-quickstart/repository/segmentstore/*.bak files.
+
+6. Run checkpoint clean-up to remove orphaned checkpoints:  
+`java -Xmx6000m -jar oak-run-*.jar checkpoints /path/to/crx-quickstart/repository/segmentstore rm-unreferenced`
+
+7. Finally compact the repository:  
+`java Xmx6000m -jar oak-run-*.jar compact /path/to/crx-quickstart/repository/segmentstore/`
